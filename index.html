@@ -1,62 +1,56 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Product Langka</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSI Student Management</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="container">
+        <h1>🎓 HSI STUDENT MANAGEMENT</h1>
 
-  <!-- HEADER -->
-  <header class="header">
-    <h1>🛍️ Product Explorer</h1>
-    <p>Jelajahi produk dari DummyJSON API</p>
-  </header>
+        <!-- Alert / Notification -->
+        <div id="alertMessage" class="alert"></div>
 
-  <!-- CONTROLS -->
-  <section class="controls">
-    <!-- 1. SEARCH -->
-    <input
-      type="text"
-      id="searchInput"
-      class="control-item"
-      placeholder="🔍 Cari produk berdasarkan nama..."
-    />
+        <!-- Form Add / Update -->
+        <div class="card">
+            <h2 id="formTitle">➕ Tambah Siswa</h2>
+            <form id="studentForm">
+                <div class="form-group">
+                    <label for="nameInput">Nama Siswa</label>
+                    <input type="text" id="nameInput" placeholder="Masukkan nama siswa" autocomplete="off" required>
+                </div>
+                <div class="form-group">
+                    <label for="scoreInput">Nilai</label>
+                    <input type="number" id="scoreInput" placeholder="Masukkan nilai (0-100)" min="0" max="100" required>
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" id="submitBtn">➕ Tambah Siswa</button>
+                    <button type="button" id="cancelEditBtn" class="btn-cancel" style="display:none;">❌ Batal Edit</button>
+                </div>
+            </form>
+        </div>
 
-    <!-- 2. FILTER CATEGORY -->
-    <select id="categorySelect" class="control-item">
-      <option value="all">Semua Kategori</option>
-    </select>
+        <!-- Statistik -->
+        <div class="stats">
+            <div class="stat-box">
+                <span class="stat-label">Total Siswa</span>
+                <span class="stat-value" id="totalStudents">0</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Rata-rata Nilai</span>
+                <span class="stat-value" id="averageScore">0</span>
+            </div>
+        </div>
 
-    <!-- 3. SORTING -->
-    <select id="sortSelect" class="control-item">
-      <option value="default">Default</option>
-      <option value="price-asc">Harga Terendah</option>
-      <option value="price-desc">Harga Tertinggi</option>
-      <option value="rating-desc">Rating Tertinggi</option>
-      <option value="name-asc">Nama A - Z</option>
-    </select>
-
-    <!-- 4. RESET -->
-    <button id="resetBtn" class="control-item btn-reset">🔄 Reset Filter</button>
-  </section>
-
-  <!-- COUNTER -->
-  <p id="productCounter" class="counter">Memuat produk...</p>
-
-  <!-- PRODUCT GRID -->
-  <main id="productGrid" class="product-grid"></main>
-
-  <!-- MODAL -->
-  <div id="modal" class="modal hidden">
-    <div class="modal-overlay" id="modalOverlay"></div>
-    <div class="modal-content">
-      <button id="modalClose" class="modal-close" title="Tutup (Esc)">✖</button>
-      <div id="modalBody" class="modal-body"></div>
+        <!-- Daftar Siswa -->
+        <div class="card">
+            <h2>📋 DAFTAR SISWA</h2>
+            <div id="studentList"></div>
+        </div>
     </div>
-  </div>
 
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

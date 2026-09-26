@@ -1,269 +1,241 @@
-/* ===== RESET & BASE ===== */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-  background: #f4f6f8;
-  color: #222;
-  padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: #333;
 }
 
-/* ===== HEADER ===== */
-.header {
-  text-align: center;
-  margin-bottom: 25px;
+.container {
+    max-width: 800px;
+    margin: 0 auto;
 }
 
-.header h1 {
-  font-size: 2rem;
-  color: #2c3e50;
+h1 {
+    text-align: center;
+    color: #fff;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.header p {
-  color: #666;
-  margin-top: 5px;
-}
-
-/* ===== CONTROLS ===== */
-.controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-bottom: 15px;
-}
-
-.control-item {
-  padding: 10px 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  background: #fff;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.control-item:focus {
-  border-color: #3498db;
-}
-
-#searchInput {
-  flex: 1;
-  min-width: 220px;
-}
-
-.btn-reset {
-  background: #e74c3c;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.btn-reset:hover {
-  background: #c0392b;
-  transform: scale(1.03);
-}
-
-.btn-reset:active {
-  transform: scale(0.97);
-}
-
-/* ===== COUNTER ===== */
-.counter {
-  text-align: center;
-  margin-bottom: 20px;
-  font-weight: 600;
-  color: #555;
-}
-
-/* ===== PRODUCT GRID ===== */
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 20px;
-}
-
-/* ===== PRODUCT CARD ===== */
 .card {
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.2s, box-shadow 0.2s;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+.card h2 {
+    margin-bottom: 15px;
+    color: #4a4a8a;
+    font-size: 1.2rem;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
 }
 
-.card img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  background: #eee;
+/* Alert */
+.alert {
+    display: none;
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-weight: 600;
+    animation: slideDown 0.3s ease;
 }
 
-.card-body {
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
+.alert.show {
+    display: block;
 }
 
-.card-category {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  color: #3498db;
-  font-weight: 700;
-  margin-bottom: 4px;
+.alert.success {
+    background: #d4edda;
+    color: #155724;
+    border-left: 5px solid #28a745;
 }
 
-.card-title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: #2c3e50;
+.alert.update {
+    background: #d1ecf1;
+    color: #0c5460;
+    border-left: 5px solid #17a2b8;
 }
 
-.card-price {
-  font-weight: 700;
-  color: #27ae60;
-  margin-bottom: 4px;
+.alert.delete {
+    background: #f8d7da;
+    color: #721c24;
+    border-left: 5px solid #dc3545;
 }
 
-.card-rating {
-  font-size: 0.85rem;
-  color: #f39c12;
-  margin-bottom: 10px;
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-.btn-detail {
-  margin-top: auto;
-  padding: 8px 12px;
-  background: #3498db;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: 0.2s;
+/* Form */
+.form-group {
+    margin-bottom: 15px;
 }
 
-.btn-detail:hover {
-  background: #2980b9;
-  transform: scale(1.03);
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #555;
 }
 
-.btn-detail:active {
-  transform: scale(0.97);
+.form-group input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
 }
 
-/* ===== MODAL ===== */
-.modal {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
 }
 
-.modal.hidden {
-  display: none;
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-.modal-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  cursor: pointer;
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.15s;
 }
 
-.modal-content {
-  position: relative;
-  background: #fff;
-  border-radius: 12px;
-  max-width: 500px;
-  width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
-  padding: 20px;
-  z-index: 1001;
-  animation: fadeIn 0.25s ease;
+button:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to   { opacity: 1; transform: scale(1); }
+#submitBtn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
 }
 
-.modal-close {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  background: transparent;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  color: #888;
-  transition: 0.2s;
+.btn-cancel {
+    background: #6c757d;
+    color: #fff;
 }
 
-.modal-close:hover {
-  color: #e74c3c;
-  transform: scale(1.2);
+/* Statistik */
+.stats {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
-.modal-body img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 12px;
+.stat-box {
+    flex: 1;
+    min-width: 150px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
-.modal-body h2 {
-  font-size: 1.3rem;
-  margin-bottom: 6px;
-  color: #2c3e50;
+.stat-label {
+    display: block;
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.modal-body .detail-category {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  color: #3498db;
-  font-weight: 700;
-  margin-bottom: 8px;
-  display: block;
+.stat-value {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #4a4a8a;
 }
 
-.modal-body p {
-  margin-bottom: 6px;
-  font-size: 0.95rem;
-  color: #444;
+/* Daftar Siswa */
+.student-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    transition: border-color 0.2s, background 0.2s;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-.modal-body .detail-price {
-  font-weight: 700;
-  color: #27ae60;
+.student-item:hover {
+    border-color: #667eea;
+    background: #f9f9ff;
 }
 
-.modal-body .detail-rating {
-  color: #f39c12;
-  font-weight: 600;
+.student-info {
+    flex: 1;
+    min-width: 180px;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 600px) {
-  .header h1 { font-size: 1.5rem; }
-  .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-  .card img { height: 140px; }
+.student-name {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #333;
+}
+
+.student-score {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 2px;
+}
+
+.score-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #fff;
+}
+
+.score-high   { background: #28a745; }
+.score-medium { background: #ffc107; color: #333; }
+.score-low    { background: #dc3545; }
+
+.student-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-edit {
+    background: #ffc107;
+    color: #333;
+}
+
+.btn-delete {
+    background: #dc3545;
+    color: #fff;
+}
+
+.empty-message {
+    text-align: center;
+    color: #999;
+    padding: 30px 10px;
+    font-style: italic;
 }

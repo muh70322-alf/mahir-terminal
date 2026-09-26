@@ -1,219 +1,260 @@
 /* =========================================================
-   1. KONFIGURASI & STATE
+   HSI STUDENT MANAGEMENT - CRUD + LocalStorage
    ========================================================= */
-const API_URL = 'https://dummyjson.com/products?limit=20';
 
-// 💱 Kurs USD → IDR
-const KURS_USD_TO_IDR = 15500;
+// ---------- 1. STATE ----------
+let students = [];        // Array of objects
+let editingId = null;     // null = mode tambah, angka = mode edit
 
-// Format Rupiah
-function formatRupiah(angkaUSD) {
-  const angkaIDR = angkaUSD * KURS_USD_TO_IDR;
-  const dibulatkan = Math.round(angkaIDR / 1000) * 1000;
-  return 'Rp ' + dibulatkan.toLocaleString('id-ID');
+// ---------- 2. DOM REFERENCES ----------
+const studentForm    = document.getElementById('studentForm');
+const nameInput      = document.getElementById('nameInput');
+const scoreInput     = document.getElementById('scoreInput');
+const submitBtn      = document.getElementById('submitBtn');
+const cancelEditBtn  = document.getElementById('cancelEditBtn');
+const formTitle      = document.getElementById('formTitle');
+const studentList    = document.getElementById('studentList');
+const totalStudents  = document.getElementById('totalStudents');
+const averageScore   = document.getElementById('averageScore');
+const alertMessage   = document.getElementById('alertMessage');
+
+// ---------- 3. LOCALSTORAGE ----------
+const STORAGE_KEY = 'students';
+
+/**
+ * Menyimpan array students ke LocalStorage
+ */
+function saveStudents() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
 }
 
-// State
-let allProducts = [];
-let filteredProducts = [];
+/**
+ * Mengambil data students dari LocalStorage
+ * Jika belum ada, return array kosong
+ */
+function loadStudents() {
+    const data = localStorage.getItem(STORAGE_KEY);
+    return data ? JSON.parse(data) : [];
+}
 
-// Ambil semua elemen DOM
-const searchInput    = document.getElementById('searchInput');
-const categorySelect = document.getElementById('categorySelect');
-const sortSelect     = document.getElementById('sortSelect');
-const resetBtn       = document.getElementById('resetBtn');
-const productCounter = document.getElementById('productCounter');
-const productGrid    = document.getElementById('productGrid');
+// ---------- 4. RENDER ----------
+/**
+ * Render ulang daftar siswa + statistik ke UI
+ */
+function renderStudents() {
+    // Kosongkan list
+    studentList.innerHTML = '';
 
-const modal        = document.getElementById('modal');
-const modalOverlay = document.getElementById('modalOverlay');
-const modalClose   = document.getElementById('modalClose');
-const modalBody    = document.getElementById('modalBody');
-
-/* =========================================================
-   2. FETCH DATA DARI API
-   ========================================================= */
-async function fetchProducts() {
-  try {
-    productCounter.textContent = 'Memuat produk...';
-
-    const response = await fetch(API_URL);
-
-    if (!response.ok) {
-      throw new Error('Gagal mengambil data dari API');
+    // Jika tidak ada data
+    if (students.length === 0) {
+        studentList.innerHTML = '<p class="empty-message">Belum ada data siswa.</p>';
+        updateStats();
+        return;
     }
 
-    const data = await response.json();
+    // Loop data students -> buat elemen HTML
+    students.forEach((student, index) => {
+        const item = document.createElement('div');
+        item.className = 'student-item';
 
-    allProducts = data.products;
-    filteredProducts = [...allProducts];
+        // Tentukan warna badge berdasarkan nilai
+        let badgeClass = 'score-low';
+        if (student.score >= 85) badgeClass = 'score-high';
+        else if (student.score >= 75) badgeClass = 'score-medium';
 
-    populateCategories(allProducts);
-    renderProducts();
+        item.innerHTML = `
+            <div class="student-info">
+                <div class="student-name">${index + 1}. ${student.name}</div>
+                <div class="student-score">
+                    Nilai: <span class="score-badge ${badgeClass}">${student.score}</span>
+                </div>
+            </div>
+            <div class="student-actions">
+                <button class="btn-edit"   onclick="editStudent(${student.id})">✏️ Ubah</button>
+                <button class="btn-delete" onclick="deleteStudent(${student.id})">🗑️ Hapus</button>
+            </div>
+        `;
 
-  } catch (error) {
-    console.error('Error:', error);
-    productCounter.textContent = 'Gagal memuat produk 😢';
-    productGrid.innerHTML = `<p style="grid-column:1/-1;text-align:center;">Terjadi kesalahan saat memuat data.</p>`;
-  }
-}
-
-/* =========================================================
-   3. ISI DROPDOWN KATEGORI
-   ========================================================= */
-function populateCategories(products) {
-  const categories = [...new Set(products.map(p => p.category))].sort();
-
-  categories.forEach(cat => {
-    const option = document.createElement('option');
-    option.value = cat;
-    option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
-    categorySelect.appendChild(option);
-  });
-}
-
-/* =========================================================
-   4. APPLY FILTER (SEARCH + CATEGORY + SORT)
-   ========================================================= */
-function applyFilters() {
-  const keyword     = searchInput.value.toLowerCase().trim();
-  const selectedCat = categorySelect.value;
-  const sortValue   = sortSelect.value;
-
-  let result = [...allProducts];
-
-  // SEARCH
-  if (keyword) {
-    result = result.filter(p => p.title.toLowerCase().includes(keyword));
-  }
-
-  // FILTER CATEGORY
-  if (selectedCat !== 'all') {
-    result = result.filter(p => p.category === selectedCat);
-  }
-
-  // SORTING
-  switch (sortValue) {
-    case 'price-asc':
-      result.sort((a, b) => a.price - b.price);
-      break;
-    case 'price-desc':
-      result.sort((a, b) => b.price - a.price);
-      break;
-    case 'rating-desc':
-      result.sort((a, b) => b.rating - a.rating);
-      break;
-    case 'name-asc':
-      result.sort((a, b) => a.title.localeCompare(b.title));
-      break;
-    default:
-      break;
-  }
-
-  filteredProducts = result;
-  renderProducts();
-}
-
-/* =========================================================
-   5. RENDER PRODUCT KE GRID
-   ========================================================= */
-function renderProducts() {
-  productCounter.textContent =
-    `${filteredProducts.length} dari ${allProducts.length} product ditampilkan.`;
-
-  if (filteredProducts.length === 0) {
-    productGrid.innerHTML = `
-      <p style="grid-column:1/-1;text-align:center;color:#888;">
-        Tidak ada product yang cocok 😕
-      </p>`;
-    return;
-  }
-
-  productGrid.innerHTML = filteredProducts.map(product => `
-    <div class="card">
-      <img src="${product.thumbnail}" alt="${product.title}" loading="lazy" />
-      <div class="card-body">
-        <span class="card-category">${product.category}</span>
-        <h3 class="card-title">${product.title}</h3>
-        <p class="card-price">${formatRupiah(product.price)}</p>
-        <p class="card-rating">⭐ ${product.rating}</p>
-        <button class="btn-detail" data-id="${product.id}">👁️ Lihat Detail</button>
-      </div>
-    </div>
-  `).join('');
-
-  // Pasang event ke tombol detail
-  document.querySelectorAll('.btn-detail').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = Number(btn.dataset.id);
-      showModal(id);
+        studentList.appendChild(item);
     });
-  });
+
+    updateStats();
 }
 
-/* =========================================================
-   6. MODAL DETAIL PRODUCT
-   ========================================================= */
-function showModal(productId) {
-  const product = allProducts.find(p => p.id === productId);
-  if (!product) return;
+/**
+ * Update statistik: total siswa & rata-rata nilai
+ */
+function updateStats() {
+    const total = students.length;
+    totalStudents.textContent = total;
 
-  modalBody.innerHTML = `
-    <img src="${product.thumbnail}" alt="${product.title}" />
-    <span class="detail-category">${product.category}</span>
-    <h2>${product.title}</h2>
-    <p>${product.description}</p>
-    <p class="detail-price">💰 Harga: ${formatRupiah(product.price)}</p>
-    <p class="detail-rating">⭐ Rating: ${product.rating}</p>
-    <p>📦 Stock: ${product.stock}</p>
-    <p>🏷️ Brand: ${product.brand || '-'}</p>
-  `;
+    if (total === 0) {
+        averageScore.textContent = '0';
+        return;
+    }
 
-  modal.classList.remove('hidden');
-  // Fokuskan tombol close agar bisa langsung tekan Enter
-  modalClose.focus();
+    const sum = students.reduce((acc, s) => acc + Number(s.score), 0);
+    const avg = sum / total;
+    averageScore.textContent = avg.toFixed(1);
 }
 
-function closeModal() {
-  modal.classList.add('hidden');
-  modalBody.innerHTML = '';
+// ---------- 5. ALERT / NOTIFICATION ----------
+let alertTimeout = null;
+
+/**
+ * Menampilkan pesan alert
+ * @param {string} message - pesan yang ditampilkan
+ * @param {string} type    - 'success' | 'update' | 'delete'
+ */
+function showAlert(message, type = 'success') {
+    alertMessage.textContent = message;
+    alertMessage.className = `alert show ${type}`;
+
+    // Bonus: hilang otomatis setelah 3 detik
+    if (alertTimeout) clearTimeout(alertTimeout);
+    alertTimeout = setTimeout(() => {
+        alertMessage.classList.remove('show');
+    }, 3000);
 }
 
-/* =========================================================
-   7. EVENT LISTENERS (SEMUA TOMBOL & KONTROL)
-   ========================================================= */
+// ---------- 6. CRUD ----------
+/**
+ * Generate ID baru (unik)
+ */
+function generateId() {
+    if (students.length === 0) return 1;
+    return Math.max(...students.map(s => s.id)) + 1;
+}
 
-// 1) SEARCH — jalan saat mengetik
-searchInput.addEventListener('input', applyFilters);
+/**
+ * Handle submit form (Add atau Update)
+ */
+function handleSubmit(event) {
+    event.preventDefault(); // cegah refresh
 
-// 2) FILTER CATEGORY — jalan saat pilih
-categorySelect.addEventListener('change', applyFilters);
+    const name  = nameInput.value.trim();
+    const score = Number(scoreInput.value);
 
-// 3) SORTING — jalan saat pilih
-sortSelect.addEventListener('change', applyFilters);
+    // Validasi sederhana
+    if (!name) {
+        showAlert('⚠️ Nama siswa tidak boleh kosong.', 'delete');
+        return;
+    }
+    if (isNaN(score) || score < 0 || score > 100) {
+        showAlert('⚠️ Nilai harus berupa angka 0-100.', 'delete');
+        return;
+    }
 
-// 4) RESET — reset semua ke default
-resetBtn.addEventListener('click', () => {
-  searchInput.value = '';
-  categorySelect.value = 'all';
-  sortSelect.value = 'default';
-  applyFilters();
-});
+    if (editingId === null) {
+        // ---- MODE ADD ----
+        addStudent(name, score);
+    } else {
+        // ---- MODE UPDATE ----
+        updateStudent(editingId, name, score);
+    }
+}
 
-// 5) TOMBOL CLOSE MODAL (X)
-modalClose.addEventListener('click', closeModal);
+/**
+ * Tambah siswa baru
+ */
+function addStudent(name, score) {
+    const newStudent = {
+        id: generateId(),
+        name: name,
+        score: score
+    };
 
-// 6) KLIK AREA LUAR MODAL (overlay)
-modalOverlay.addEventListener('click', closeModal);
+    students.push(newStudent);
+    saveStudents();
+    renderStudents();
+    resetForm();
 
-// 7) TEKAN ESCAPE
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-    closeModal();
-  }
-});
+    showAlert(`✅ Data siswa ${name} berhasil ditambahkan.`, 'success');
+}
 
-/* =========================================================
-   8. INISIALISASI
-   ========================================================= */
-fetchProducts();
+/**
+ * Masuk ke mode edit: isi form dengan data student
+ */
+function editStudent(id) {
+    const student = students.find(s => s.id === id);
+    if (!student) return;
+
+    // Isi form
+    nameInput.value  = student.name;
+    scoreInput.value = student.score;
+
+    // Ubah state & tombol
+    editingId = id;
+    formTitle.textContent = '✏️ Edit Siswa';
+    submitBtn.textContent = '💾 Update Siswa';
+    cancelEditBtn.style.display = 'inline-block';
+
+    nameInput.focus();
+}
+
+/**
+ * Update data siswa
+ */
+function updateStudent(id, name, score) {
+    const index = students.findIndex(s => s.id === id);
+    if (index === -1) return;
+
+    students[index].name  = name;
+    students[index].score = score;
+
+    saveStudents();
+    renderStudents();
+    resetForm();
+
+    showAlert(`🔄 Data siswa ${name} berhasil diperbarui.`, 'update');
+}
+
+/**
+ * Hapus siswa dengan confirm dialog
+ */
+function deleteStudent(id) {
+    const student = students.find(s => s.id === id);
+    if (!student) return;
+
+    // Confirm dialog
+    const yakin = confirm(`Apakah kamu yakin ingin menghapus siswa ${student.name}?`);
+    if (!yakin) return; // Cancel -> tidak ada perubahan
+
+    // Hapus dari array
+    students = students.filter(s => s.id !== id);
+
+    // Jika sedang edit student yang dihapus, reset form
+    if (editingId === id) resetForm();
+
+    saveStudents();
+    renderStudents();
+
+    showAlert(`🗑️ Data siswa ${student.name} berhasil dihapus.`, 'delete');
+}
+
+// ---------- 7. FORM HELPERS ----------
+/**
+ * Reset form ke mode tambah
+ */
+function resetForm() {
+    studentForm.reset();
+    editingId = null;
+    formTitle.textContent = '➕ Tambah Siswa';
+    submitBtn.textContent = '➕ Tambah Siswa';
+    cancelEditBtn.style.display = 'none';
+}
+
+// ---------- 8. EVENT LISTENERS ----------
+studentForm.addEventListener('submit', handleSubmit);
+cancelEditBtn.addEventListener('click', resetForm);
+
+// ---------- 9. INIT ----------
+/**
+ * Inisialisasi aplikasi
+ */
+function init() {
+    students = loadStudents(); // ambil dari LocalStorage
+    renderStudents();          // render ke UI
+}
+
+init();
