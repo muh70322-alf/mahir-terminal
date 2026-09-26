@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Langka</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <h1>🛍️ Product Explorer</h1>
+    <p>Jelajahi produk dari DummyJSON API</p>
+  </header>
+
+  <!-- CONTROLS -->
+  <section class="controls">
+    <!-- 1. SEARCH -->
+    <input
+      type="text"
+      id="searchInput"
+      class="control-item"
+      placeholder="🔍 Cari produk berdasarkan nama..."
+    />
+
+    <!-- 2. FILTER CATEGORY -->
+    <select id="categorySelect" class="control-item">
+      <option value="all">Semua Kategori</option>
+    </select>
+
+    <!-- 3. SORTING -->
+    <select id="sortSelect" class="control-item">
+      <option value="default">Default</option>
+      <option value="price-asc">Harga Terendah</option>
+      <option value="price-desc">Harga Tertinggi</option>
+      <option value="rating-desc">Rating Tertinggi</option>
+      <option value="name-asc">Nama A - Z</option>
+    </select>
+
+    <!-- 4. RESET -->
+    <button id="resetBtn" class="control-item btn-reset">🔄 Reset Filter</button>
+  </section>
+
+  <!-- COUNTER -->
+  <p id="productCounter" class="counter">Memuat produk...</p>
+
+  <!-- PRODUCT GRID -->
+  <main id="productGrid" class="product-grid"></main>
+
+  <!-- MODAL -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="modal-content">
+      <button id="modalClose" class="modal-close" title="Tutup (Esc)">✖</button>
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
